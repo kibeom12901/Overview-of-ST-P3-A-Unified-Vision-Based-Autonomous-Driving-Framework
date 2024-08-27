@@ -58,207 +58,148 @@
   - Refines the selected trajectory using prior knowledge and real-time visual information (e.g., from the front camera).
 
 ---
-## Perception: Egocentric Aligned Accumulation
+# Perception: Egocentric Aligned Accumulation
 
-**Objective:** 
-The goal here is to create a spatiotemporal Bird's Eye View (BEV) feature from multi-view camera inputs over several time steps.
+## Objective
+The goal is to create a spatiotemporal Bird's Eye View (BEV) feature from multi-view camera inputs over several time steps.
 
-**Challenges Addressed:**
+## Challenges Addressed
 - **Alignment Issues:** Direct concatenation methods suffer from alignment problems.
 - **Height Information Loss:** Some existing methods like FIERY lose important height information during the process.
 
-**Proposed Method:** 
+## Proposed Method
 The framework introduces an accumulative ego-centric alignment method, which includes two key steps:
 
-1. **Spatial Fusion:**
-   - **Transformation:** Multi-view images are transformed into a common 3D frame using depth predictions.
-   - **Feature Extraction:** Features from each camera image are lifted into 3D space based on depth estimations, using the equation:
+### 1. Spatial Fusion
+- **Transformation:** Multi-view images are transformed into a common 3D frame using depth predictions.
+- **Feature Extraction:** Features from each camera image are lifted into 3D space based on depth estimations, using the equation:
 
-   <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?u_i^k=f_i^k\otimes%20d_i^k" alt="u_i^k = f_i^k \otimes d_i^k"/>
-   </p>
+  ![equation](https://latex.codecogs.com/png.latex?u_i^k%20%3D%20f_i^k%20%5Cotimes%20d_i^k)
 
-   - <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?Here,\%20u_i^k\%20represents\%20the\%203D\%20features,\%20f_i^k\%20is\%20the\%20feature\%20map,\%20and\%20d_i^k\%20is\%20the\%20depth\%20map."/>
-   </p>
-   
-   - **Alignment:** These features are then aligned to the current view using the vehicle’s ego-motion and pooled into BEV features.
+  Here, $u_i^k$ represents the 3D features, $f_i^k$ is the feature map, and $d_i^k$ is the depth map.
 
-2. **Temporal Fusion:**
-   - **Enhancement of Static Object Perception:** A temporal fusion technique is applied to enhance the perception of static objects by using a self-attention mechanism that boosts the importance of features from previous time steps.
-   - **Equation:**
+- **Alignment:** These features are then aligned to the current view using the vehicle’s ego-motion and pooled into BEV features.
 
-   <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?\tilde{x}_t=b_t+\sum_{i=1}^{t-1}\alpha^i\times\tilde{x}_{t-i}" alt="\tilde{x}_t = b_t + \sum_{i=1}^{t-1} \alpha^i \times \tilde{x}_{t-i}"/>
-   </p>
+### 2. Temporal Fusion
+- **Enhancement of Static Object Perception:** A temporal fusion technique is applied to enhance the perception of static objects by using a self-attention mechanism that boosts the importance of features from previous time steps.
 
-   - <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?Here,\%20\tilde{x}_t\%20represents\%20the\%20accumulated\%20feature,\%20and\%20b_t\%20is\%20the\%20BEV\%20feature\%20map."/>
-   </p>
-   
-   - **3D Convolutions:** These fused features are then processed with 3D convolutions to improve the perception of dynamic objects, using the equation:
+  ![equation](https://latex.codecogs.com/png.latex?%5Ctilde%7Bx%7D_t%20%3D%20b_t%20%2B%20%5Csum_%7Bi%3D1%7D%5E%7Bt-1%7D%20%5Calpha_i%20%5Ctimes%20%5Ctilde%7Bx%7D_%7Bt-i%7D)
 
-   <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?x_{1\sim%20t}=\mathcal{C}(\tilde{x}_{1\sim%20t},m_{1\sim%20t})" alt="x_{1\sim t} = \mathcal{C}(\tilde{x}_{1\sim t}, m_{1\sim t})"/>
-   </p>
+  Here, $\tilde{x}_t$ represents the accumulated feature, and $b_t$ is the BEV feature map.
 
-   - <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?Where\%20m_{1\sim\%20t}\%20is\%20the\%20ego-motion\%20matrix,\%20and\%20\mathcal{C}\%20represents\%20the\%203D\%20convolution\%20network."/>
-   </p>
-   
+- **3D Convolutions:** These fused features are then processed with 3D convolutions to improve the perception of dynamic objects, using the equation:
+
+  ![equation](https://latex.codecogs.com/png.latex?x_%7B1%5Csim%20t%7D%20%3D%20C(%5Ctilde%7Bx%7D_%7B1%5Csim%20t%7D%2C%20m_%7B1%5Csim%20t%7D))
+
+  Where $m_{1\sim t}$ is the ego-motion matrix, and $C$ represents the 3D convolution network.
+
 ---
 
 ## Prediction: Dual Pathway Probabilistic Future Modeling
 
-**Overview:**
-In dynamic driving environments, predicting future trajectories is challenging due to the uncertainty and stochastic nature of the future. Traditional methods often predict future trajectories deterministically or using a finite set of probable outcomes. However, this approach is insufficient to capture the complexities of interactions among various agents, traffic elements, and road conditions.
+### Overview
+In dynamic driving environments, predicting future trajectories is challenging due to the uncertainty and stochastic nature of the future. The aim is to model the uncertainty in future predictions by considering the stochastic nature of the driving environment.
 
-**Objective:** 
-The aim is to model the uncertainty in future predictions by considering the stochastic nature of the driving environment.
+### Methodology
 
-**Methodology:**
+#### 1. Uncertainty Modeling
+- **Gaussian Distribution:** The future uncertainty is modeled as diagonal Gaussians with a mean ($\mu$) and variance ($\sigma^2$). Here, $\mu$ and $\sigma^2$ represent the latent channels in the model.
+- **Sampling During Training:** During training, the system samples from a Gaussian distribution ![equation](https://latex.codecogs.com/png.latex?%5Ceta_t%20%5Csim%20%5Cmathcal%7BN%7D(%5Cmu_t%2C%20%5Csigma_t%5E2)), but during inference, it samples from ![equation](https://latex.codecogs.com/png.latex?%5Ceta_t%20%5Csim%20%5Cmathcal%7BN%7D(%5Cmu_t%2C%200)).
 
-1. **Uncertainty Modeling:**
-   - **Gaussian Distribution:** The future uncertainty is modeled as diagonal Gaussians with a mean (\(\mu\)) and variance (\(\sigma^2\)). Here, \(\mu\) and \(\sigma^2\) represent the latent channels in the model. 
-   - **Sampling During Training:** During training, the system samples from a Gaussian distribution \(\eta_t \sim N(\mu_t, \sigma_t^2)\), but during inference (actual operation), it samples from \(\eta_t \sim N(\mu_t, 0)\), meaning only the mean is considered.
+#### 2. Dual Pathway Architecture
+- **Pathway A:** Integrates BEV features up to the current timestamp with the uncertainty distribution. This pathway uses historical features as input to a GRU (Gated Recurrent Unit), where the first feature $x_1$ is used as the initial hidden state.
+- **Pathway B:** Uses the sampled Gaussian distribution $\eta_t$ as input to a GRU, with the current feature $x_t$ as the initial hidden state.
 
-   - <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?Here,\%20\mu\%20and\%20\sigma^2\%20represent\%20the\%20latent\%20channels\%20in\%20the\%20model."/>
-   </p>
+#### 3. Prediction Combination
 
-2. **Dual Pathway Architecture:**
+  ![equation](https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D_%7Bt%2B1%7D%20%3D%20G(x_t%2C%20%5Ceta_t)%20%5Coplus%20G(x_%7B0%3At%7D))
 
-   - **Pathway a:** Integrates BEV features up to the current timestamp with the uncertainty distribution. This pathway uses historical features as input to a GRU (Gated Recurrent Unit), where the first feature \(x_1\) is used as the initial hidden state.
-   - **Pathway b:** Uses the sampled Gaussian distribution \(\eta_t\) as input to a GRU, with the current feature \(x_t\) as the initial hidden state.
+  Here, $G$ represents the GRU process, and $\oplus$ denotes the combination of these predictions.
 
-3. **Prediction Combination:**
-   - The predicted feature for the next time step \(\hat{x}_{t+1}\) is generated by combining the outputs from both pathways:
-   
-   <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?\hat{x}_{t+1}=\mathcal{G}(x_t,\eta_t)\oplus\mathcal{G}(x_{0:t})" alt="\hat{x}_{t+1} = \mathcal{G}(x_t, \eta_t) \oplus \mathcal{G}(x_{0:t})"/>
-   </p>
+- **Future State Predictions:** This combined prediction serves as the base for future state predictions (up to $H$ horizons).
 
-   - <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?Here,\%20\mathcal{G}\%20represents\%20the\%20GRU\%20process,\%20and\%20\oplus\%20denotes\%20the\%20combination\%20of\%20these\%20predictions."/>
-   </p>
-   
-   - This combined prediction serves as the base for future state predictions (up to \(H\) horizons).
-
-4. **Decoding:**
-
-   - The combined features from both pathways are fed into a decoder, which has multiple output heads. These heads generate different interpretable intermediate representations such as:
-     - **Instance Segmentation:** Outputs instance centerness, offset, and future flow for identifying objects like vehicles and pedestrians.
-     - **Semantic Segmentation:** Focuses on key actors like vehicles and pedestrians.
-     - **HD Map Elements:** Generates interpretable map elements like drivable areas and lane boundaries, which are crucial for autonomous driving.
-     - **Cost Volume:** A specific head is designed to represent the cost associated with each possible trajectory within the planning horizon.
+#### 4. Decoding
+- **Multi-Head Decoder:** The combined features from both pathways are fed into a decoder, which has multiple output heads. These heads generate different interpretable intermediate representations such as:
+  - **Instance Segmentation:** Outputs instance centerness, offset, and future flow for identifying objects like vehicles and pedestrians.
+  - **Semantic Segmentation:** Focuses on key actors like vehicles and pedestrians.
+  - **HD Map Elements:** Generates interpretable map elements like drivable areas and lane boundaries, which are crucial for autonomous driving.
+  - **Cost Volume:** A specific head is designed to represent the cost associated with each possible trajectory within the planning horizon.
 
 ---
 
 ## Planning Module
 
-**Objective of the Planner:**
-
+### Objective of the Planner
 The main goal is to plan a safe and comfortable trajectory that will guide the SDV towards a target point while avoiding obstacles and considering traffic rules.
 
-**Trajectory Sampling and Cost Function:**
+### Trajectory Sampling and Cost Function
 
-The system generates a set of possible trajectories using a simplified vehicle model (the bicycle model) and evaluates each trajectory using a cost function. The trajectory with the lowest cost is selected as the best option.
+#### Sampling
+The system generates a set of possible trajectories using a simplified vehicle model (the bicycle model) and evaluates each trajectory using a cost function.
 
-### Equation (5):
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.latex?f(\tau,o,m;w)=f_o(\tau,o,m;w_o)+f_v(\tau;w_v)+f_r(\tau;w_r)" alt="f(\tau, o, m; w) = f_o(\tau, o, m; w_o) + f_v(\tau; w_v) + f_r(\tau; w_r)"/>
-</p>
+  ![equation](https://latex.codecogs.com/png.latex?f(%5Ctau%2C%20o%2C%20m%3B%20w)%20%3D%20f_o(%5Ctau%2C%20o%2C%20m%3B%20w_o)%20%2B%20f_v(%5Ctau%3B%20w_v)%20%2B%20f_r(%5Ctau%3B%20w_r))
 
-This equation describes the total cost function \( f(\tau, o, m; w) \), which is a sum of three sub-costs:
+  This equation describes the total cost function $f(\tau, o, m; w)$, which is a sum of three sub-costs:
+  - **$f_o$:** Evaluates the trajectory based on occupancy predictions and map representations, considering safety and compliance with traffic rules.
+  - **$f_v$:** Comes from the prediction module and is based on the learned features (e.g., the predicted future states of the environment).
+  - **$f_r$:** Considers the overall performance of the trajectory, including comfort (e.g., minimizing sudden jerks or sharp turns) and progress towards the destination.
 
-- <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?f_o\%20represents\%20the\%20sub-cost\%20that\%20evaluates\%20the\%20trajectory\%20based\%20on\%20occupancy\%20predictions\%20and\%20map\%20representations,\%20considering\%20safety\%20and\%20compliance\%20with\%20traffic\%20rules."/>
-   </p>
-- <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?f_v\%20comes\%20from\%20the\%20prediction\%20module\%20and\%20is\%20based\%20on\%20the\%20learned\%20features\%20(e.g.,\%20the\%20predicted\%20future\%20states\%20of\%20the\%20environment)." alt="f_v comes from the prediction module and is based on the learned features (e.g., the predicted future states of the environment)."/>
-   </p>
-- <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?f_r\%20considers\%20the\%20overall\%20performance\%20of\%20the\%20trajectory,\%20including\%20comfort\%20(e.g.,\%20minimizing\%20sudden\%20jerks\%20or\%20sharp\%20turns)\%20and\%20progress\%20towards\%20the\%20destination." alt="f_r considers the overall performance of the trajectory, including comfort (e.g., minimizing sudden jerks or sharp turns) and progress towards the destination."/>
-   </p>
-
-### Sub-Costs:
-
+#### Sub-Costs
 - **Safety Cost:** Ensures the SDV avoids collisions with other objects and maintains a safe distance from obstacles, particularly at high speeds.
 - **Cost Volume:** A learned representation generated by the prediction module that reflects the complexity of the environment. It is clipped to ensure it doesn't dominate the evaluation of trajectories.
 - **Comfort and Progress:** Penalizes trajectories that involve excessive lateral acceleration, jerk, or curvature, and rewards trajectories that efficiently move towards the destination.
 
-### High-Level Commands and Target Information:
+### High-Level Commands and Target Information
+- **Command-Based Planning:** The cost function does not inherently include target information (e.g., the final destination). Instead, the planner uses high-level commands (like "Go Straight" or "Turn Left") to evaluate and select trajectories that align with the desired action.
 
-The cost function does not inherently include target information (e.g., the final destination), which is often available in traditional map-based routing. Instead, the planner uses high-level commands (like "Go Straight" or "Turn Left") to evaluate and select trajectories that align with the desired action.
+### Selecting the Optimal Trajectory
 
-### Selecting the Optimal Trajectory:
+  ![equation](https://latex.codecogs.com/png.latex?%5Ctau%5E*%20%3D%20%5Cunderset%7B%5Ctau_h%7D%7B%5Ctext%7Barg%20min%7D%7D%20f(%5Ctau_h%2C%20o%2C%20m%3B%20w))
 
-### Equation (6):
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.latex?\tau^*=\arg\min_{\tau_h}f(\tau_h,c)=\arg\min_{\tau_h}f(\tau_h,o,m;w)" alt="\tau^* = \arg \min_{\tau_h} f(\tau_h, c) = \arg \min_{\tau_h} f(\tau_h, o, m; w)"/>
-</p>
+  This equation identifies the optimal trajectory $\tau^*$ from the set of possible trajectories $\tau_h$ by minimizing the cost function $f(\tau_h, o, m; w)$.
 
-This equation identifies the optimal trajectory \( \tau^* \) from the set of possible trajectories \( \tau_h \) by minimizing the cost function \( f(\tau_h, o, m; w) \).
+#### GRU-Based Refinement
+- **Post-Selection Refinement:** After selecting the optimal trajectory, the system further refines it using a GRU network. This step integrates information from the front-view camera (such as the status of traffic lights) to ensure the trajectory is safe and appropriate given the current traffic conditions.
+- **Adjustment of Trajectory:** The GRU refines the trajectory by processing the trajectory points $\tau^*$ and adjusting them based on real-time visual information from the cameras.
 
-- <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?\tau_h\%20represents\%20the\%20set\%20of\%20possible\%20trajectories\%20under\%20the\%20given\%20high-level\%20command,\%20and\%20c\%20represents\%20the\%20overall\%20cost\%20map."/>
-   </p>
-
-### GRU-Based Refinement:
-
-After selecting the optimal trajectory, the system further refines it using a GRU network. This step integrates information from the front-view camera (such as the status of traffic lights) to ensure the trajectory is safe and appropriate given the current traffic conditions.
-
-- <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?The\%20GRU\%20refines\%20the\%20trajectory\%20by\%20processing\%20the\%20trajectory\%20points\%20\tau^*\%20and\%20adjusting\%20them\%20based\%20on\%20real-time\%20visual\%20information\%20from\%20the\%20cameras."/>
-   </p>
 ---
 
 ## Breakdown of the Loss Function
 
-### Overall Loss Function (Equation 7):
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.latex?\mathcal{L}=\mathcal{L}_{per}+\alpha\mathcal{L}_{pre}+\beta\mathcal{L}_{pla}" alt="\mathcal{L} = \mathcal{L}_{per} + \alpha \mathcal{L}_{pre} + \beta \mathcal{L}_{pla}"/>
-</p>
+### Overall Loss Function (Equation 7)
 
-### Components:
+  ![equation](https://latex.codecogs.com/png.latex?L%20%3D%20L_%7Bper%7D%20%2B%20%5Calpha%20L_%7Bpre%7D%20%2B%20%5Cbeta%20L_%7Bpla%7D)
 
-- **\( \mathcal{L}_{per} \): Perception loss.**
-- **\( \alpha \mathcal{L}_{pre} \): Prediction loss, scaled by a learnable weight \( \alpha \).**
-- **\( \beta \mathcal{L}_{pla} \): Planning loss, scaled by a learnable weight \( \beta \).**
+  Components:
+  - **$L_{per}$:** Perception loss.
+  - **$\alpha L_{pre}$:** Prediction loss, scaled by a learnable weight $\alpha$.
+  - **$\beta L_{pla}$:** Planning loss, scaled by a learnable weight $\beta$.
 
-### Learnable Weights:
-\( \alpha \) and \( \beta \) are not fixed constants but are learnable parameters. This allows the model to dynamically balance the contribution of each loss component based on the gradients during training. This approach follows protocols from previous research, such as in [30, 11].
+  **Learnable Weights:** $\alpha$ and $\beta$ are not fixed constants but are learnable parameters, allowing the model to dynamically balance the contribution of each loss component based on the gradients during training.
 
-### Perception Loss \( \mathcal{L}_{per} \):
+### Perception Loss ($L_{per}$)
+- **Segmentation Loss:** Includes the loss for segmenting both current and past frames, as well as mapping losses (e.g., lane and drivable area prediction) and depth prediction.
+- **Top-k Cross-Entropy Loss:** Used for semantic segmentation, focusing on the most relevant classes.
+- **L2 and L1 Losses:** Used for instance segmentation tasks like centerness supervision and offset/flow prediction.
+- **Depth Loss:** Uses a pre-generated depth value from another network for direct supervision.
 
-- **Components:**
-  - **Segmentation Loss:** This includes the loss for segmenting both current and past frames. It also includes losses related to mapping (e.g., lane and drivable area prediction) and depth prediction.
-  - **Top-k Cross-Entropy Loss:** Used for semantic segmentation, focusing on the most relevant classes (since the BEV image is largely dominated by background).
-  - **L2 and L1 Losses:** Used for instance segmentation tasks like centerness supervision and offset/flow prediction.
-  - **Depth Loss:** While some methods optimize depth prediction implicitly, ST-P3 uses a pre-generated depth value from another network for direct supervision.
-
-### Prediction Loss \( \mathcal{L}_{pre} \):
-
+### Prediction Loss ($L_{pre}$)
 - **Semantic and Instance Segmentation:** The prediction module also infers future semantic and instance segmentation, using a similar top-k cross-entropy loss as in the perception task.
 - **Discounting Future Losses:** Future predictions are more uncertain, so losses for future timestamps are exponentially discounted to account for this uncertainty.
 
-### Planning Loss \( \mathcal{L}_{pla} \):
+### Planning Loss ($L_{pla}$)
 
-- **Components:**
-  - **Max-Margin Loss:** The model treats expert behavior \( \tau_h \) as a positive example and trajectories sampled from the set \( \tau \) as negative examples. The max-margin loss helps ensure that the expert behavior is preferred over sampled trajectories.
-  - **L1 Distance Loss:** Measures the distance between the planned trajectory and the expert trajectory. This loss is used to refine the selected trajectory and bring it closer to what a human expert might choose.
+#### Components
+- **Max-Margin Loss:** The model treats expert behavior $\tau_h$ as a positive example and trajectories sampled from the set $\tau$ as negative examples. The max-margin loss helps ensure that the expert behavior is preferred over sampled trajectories.
+- **L1 Distance Loss:** Measures the distance between the planned trajectory and the expert trajectory. This loss is used to refine the selected trajectory and bring it closer to what a human expert might choose.
 
-### Equation (8):
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.latex?\mathcal{L}_{pla}=\max_{\tau}\left[f(\tau_h,c)-f(\tau,c)+d(\tau_h,\tau)\right]_++d(\tau_h,\tau_o^*)" alt="\mathcal{L}_{pla} = \max_{\tau} \left[ f(\tau_h, c) - f(\tau, c) + d(\tau_h, \tau) \right]_+ + d(\tau_h, \tau_o^*)"/>
-</p>
+#### Equation (8)
 
-- <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?ReLU\%20Function\%20[\cdot]_+\%20ensures\%20that\%20the\%20loss\%20is\%20non-negative."/>
-   </p>
-- <p align="center">
-     <img src="https://latex.codecogs.com/svg.latex?Distance\%20d(\tau_h,\%20\tau)\%20measures\%20how\%20far\%20the\%20sampled\%20trajectory\%20\tau\%20is\%20from\%20the\%20expert\%20trajectory\%20\tau_h.\%20The\%20goal\%20is\%20to\%20minimize\%20this\%20distance\%20for\%20the\%20selected\%20trajectory."/>
-   </p>
+  ![equation](https://latex.codecogs.com/png.latex?L_%7Bpla%7D%20%3D%20%5Cunderset%7B%5Ctau%7D%7B%5Ctext%7Bmax%7D%7D%20%5Bf(%5Ctau_h%2C%20c)%20-%20f(%5Ctau%2C%20c)%20%2B%20d(%5Ctau_h%2C%20%5Ctau)%5D_%2B%20%2B%20d(%5Ctau_h%2C%20%5Ctau_o%5E*))
+
+  **ReLU Function $[\cdot]_+$:** Ensures that the loss is non-negative.
+
+  **Distance $d(\tau_h, \tau)$:** Measures how far the sampled trajectory $\tau$ is from the expert trajectory $\tau_h$. The goal is to minimize this distance for the selected trajectory.
 
 ---
 
