@@ -78,7 +78,10 @@ The framework introduces an accumulative ego-centric alignment method, which inc
      <img src="https://latex.codecogs.com/svg.latex?u_i^k=f_i^k\otimes%20d_i^k" alt="u_i^k = f_i^k \otimes d_i^k"/>
    </p>
 
-   - Here, \( u_i^k \) represents the 3D features, \( f_i^k \) is the feature map, and \( d_i^k \) is the depth map.
+   - <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?Here,\%20u_i^k\%20represents\%20the\%203D\%20features,\%20f_i^k\%20is\%20the\%20feature\%20map,\%20and\%20d_i^k\%20is\%20the\%20depth\%20map."/>
+   </p>
+   
    - **Alignment:** These features are then aligned to the current view using the vehicle’s ego-motion and pooled into BEV features.
 
 2. **Temporal Fusion:**
@@ -89,15 +92,20 @@ The framework introduces an accumulative ego-centric alignment method, which inc
      <img src="https://latex.codecogs.com/svg.latex?\tilde{x}_t=b_t+\sum_{i=1}^{t-1}\alpha^i\times\tilde{x}_{t-i}" alt="\tilde{x}_t = b_t + \sum_{i=1}^{t-1} \alpha^i \times \tilde{x}_{t-i}"/>
    </p>
 
-   - Here, \( \tilde{x}_t \) represents the accumulated feature, and \( b_t \) is the BEV feature map.
+   - <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?Here,\%20\tilde{x}_t\%20represents\%20the\%20accumulated\%20feature,\%20and\%20b_t\%20is\%20the\%20BEV\%20feature\%20map."/>
+   </p>
+   
    - **3D Convolutions:** These fused features are then processed with 3D convolutions to improve the perception of dynamic objects, using the equation:
 
    <p align="center">
      <img src="https://latex.codecogs.com/svg.latex?x_{1\sim%20t}=\mathcal{C}(\tilde{x}_{1\sim%20t},m_{1\sim%20t})" alt="x_{1\sim t} = \mathcal{C}(\tilde{x}_{1\sim t}, m_{1\sim t})"/>
    </p>
 
-   - Where \( m_{1\sim t} \) is the ego-motion matrix, and \( \mathcal{C} \) represents the 3D convolution network.
-
+   - <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?Where\%20m_{1\sim\%20t}\%20is\%20the\%20ego-motion\%20matrix,\%20and\%20\mathcal{C}\%20represents\%20the\%203D\%20convolution\%20network."/>
+   </p>
+   
 ---
 
 ## Prediction: Dual Pathway Probabilistic Future Modeling
@@ -114,6 +122,10 @@ The aim is to model the uncertainty in future predictions by considering the sto
    - **Gaussian Distribution:** The future uncertainty is modeled as diagonal Gaussians with a mean (\(\mu\)) and variance (\(\sigma^2\)). Here, \(\mu\) and \(\sigma^2\) represent the latent channels in the model. 
    - **Sampling During Training:** During training, the system samples from a Gaussian distribution \(\eta_t \sim N(\mu_t, \sigma_t^2)\), but during inference (actual operation), it samples from \(\eta_t \sim N(\mu_t, 0)\), meaning only the mean is considered.
 
+   - <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?Here,\%20\mu\%20and\%20\sigma^2\%20represent\%20the\%20latent\%20channels\%20in\%20the\%20model."/>
+   </p>
+
 2. **Dual Pathway Architecture:**
 
    - **Pathway a:** Integrates BEV features up to the current timestamp with the uncertainty distribution. This pathway uses historical features as input to a GRU (Gated Recurrent Unit), where the first feature \(x_1\) is used as the initial hidden state.
@@ -126,7 +138,10 @@ The aim is to model the uncertainty in future predictions by considering the sto
      <img src="https://latex.codecogs.com/svg.latex?\hat{x}_{t+1}=\mathcal{G}(x_t,\eta_t)\oplus\mathcal{G}(x_{0:t})" alt="\hat{x}_{t+1} = \mathcal{G}(x_t, \eta_t) \oplus \mathcal{G}(x_{0:t})"/>
    </p>
 
-   - Here, \(\mathcal{G}\) represents the GRU process, and \(\oplus\) denotes the combination of these predictions.
+   - <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?Here,\%20\mathcal{G}\%20represents\%20the\%20GRU\%20process,\%20and\%20\oplus\%20denotes\%20the\%20combination\%20of\%20these\%20predictions."/>
+   </p>
+   
    - This combined prediction serves as the base for future state predictions (up to \(H\) horizons).
 
 4. **Decoding:**
@@ -156,9 +171,15 @@ The system generates a set of possible trajectories using a simplified vehicle m
 
 This equation describes the total cost function \( f(\tau, o, m; w) \), which is a sum of three sub-costs:
 
-- \( f_o \): Evaluates the trajectory based on occupancy predictions and map representations, considering safety and compliance with traffic rules.
-- \( f_v \): Comes from the prediction module and is based on the learned features (e.g., the predicted future states of the environment).
-- \( f_r \): Considers the overall performance of the trajectory, including comfort (e.g., minimizing sudden jerks or sharp turns) and progress towards the destination.
+- <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?f_o\%20represents\%20the\%20sub-cost\%20that\%20evaluates\%20the\%20trajectory\%20based\%20on\%20occupancy\%20predictions\%20and\%20map\%20representations,\%20considering\%20safety\%20and\%20compliance\%20with\%20traffic\%20rules."/>
+   </p>
+- <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?f_v\%20comes\%20from\%20the\%20prediction\%20module\%20and\%20is\%20based\%20on\%20the\%20learned\%20features\%20(e.g.,\%20the\%20predicted\%20future\%20states\%20of\%20the\%20environment)." alt="f_v comes from the prediction module and is based on the learned features (e.g., the predicted future states of the environment)."/>
+   </p>
+- <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?f_r\%20considers\%20the\%20overall\%20performance\%20of\%20the\%20trajectory,\%20including\%20comfort\%20(e.g.,\%20minimizing\%20sudden\%20jerks\%20or\%20sharp\%20turns)\%20and\%20progress\%20towards\%20the\%20destination." alt="f_r considers the overall performance of the trajectory, including comfort (e.g., minimizing sudden jerks or sharp turns) and progress towards the destination."/>
+   </p>
 
 ### Sub-Costs:
 
@@ -179,14 +200,17 @@ The cost function does not inherently include target information (e.g., the fina
 
 This equation identifies the optimal trajectory \( \tau^* \) from the set of possible trajectories \( \tau_h \) by minimizing the cost function \( f(\tau_h, o, m; w) \).
 
-- \( \tau_h \) represents the set of possible trajectories under the given high-level command, and \( c \) represents the overall cost map.
+- <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?\tau_h\%20represents\%20the\%20set\%20of\%20possible\%20trajectories\%20under\%20the\%20given\%20high-level\%20command,\%20and\%20c\%20represents\%20the\%20overall\%20cost\%20map."/>
+   </p>
 
 ### GRU-Based Refinement:
 
 After selecting the optimal trajectory, the system further refines it using a GRU network. This step integrates information from the front-view camera (such as the status of traffic lights) to ensure the trajectory is safe and appropriate given the current traffic conditions.
 
-The GRU refines the trajectory by processing the trajectory points \( \tau^* \) and adjusting them based on real-time visual information from the cameras.
-
+- <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?The\%20GRU\%20refines\%20the\%20trajectory\%20by\%20processing\%20the\%20trajectory\%20points\%20\tau^*\%20and\%20adjusting\%20them\%20based\%20on\%20real-time\%20visual\%20information\%20from\%20the\%20cameras."/>
+   </p>
 ---
 
 ## Breakdown of the Loss Function
@@ -229,8 +253,12 @@ The GRU refines the trajectory by processing the trajectory points \( \tau^* \) 
   <img src="https://latex.codecogs.com/svg.latex?\mathcal{L}_{pla}=\max_{\tau}\left[f(\tau_h,c)-f(\tau,c)+d(\tau_h,\tau)\right]_++d(\tau_h,\tau_o^*)" alt="\mathcal{L}_{pla} = \max_{\tau} \left[ f(\tau_h, c) - f(\tau, c) + d(\tau_h, \tau) \right]_+ + d(\tau_h, \tau_o^*)"/>
 </p>
 
-- **ReLU Function \( [\cdot]_+ \):** Ensures that the loss is non-negative.
-- **Distance \( d(\tau_h, \tau) \):** Measures how far the sampled trajectory \( \tau \) is from the expert trajectory \( \tau_h \). The goal is to minimize this distance for the selected trajectory.
+- <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?ReLU\%20Function\%20[\cdot]_+\%20ensures\%20that\%20the\%20loss\%20is\%20non-negative."/>
+   </p>
+- <p align="center">
+     <img src="https://latex.codecogs.com/svg.latex?Distance\%20d(\tau_h,\%20\tau)\%20measures\%20how\%20far\%20the\%20sampled\%20trajectory\%20\tau\%20is\%20from\%20the\%20expert\%20trajectory\%20\tau_h.\%20The\%20goal\%20is\%20to\%20minimize\%20this\%20distance\%20for\%20the\%20selected\%20trajectory."/>
+   </p>
 
 ---
 
