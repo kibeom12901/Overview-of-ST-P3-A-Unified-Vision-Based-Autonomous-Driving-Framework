@@ -81,7 +81,7 @@ The framework introduces an accumulative ego-centric alignment method, which inc
 
 - **Alignment:** These features are then aligned to the current view using the vehicle’s ego-motion and pooled into BEV features.
 
-![Spatial Fusion Process](https://github.com/user-attachments/assets/file-KMsJLiumjPDwW6QIjabFFrig)
+<img width="471" alt="Screenshot 2024-08-27 at 5 29 21 PM" src="https://github.com/user-attachments/assets/35e6d011-8987-4537-8360-97473916e567">
 
 **Figure:** This image illustrates the Egocentric-Aligned Accumulation process used in the Perception module, breaking it down into:
 
@@ -118,8 +118,8 @@ In dynamic driving environments, predicting future trajectories is challenging d
 #### 2. Dual Pathway Architecture
 - **Pathway A:** Integrates BEV features up to the current timestamp with the uncertainty distribution. This pathway uses historical features as input to a GRU (Gated Recurrent Unit), where the first feature $x_1$ is used as the initial hidden state.
 - **Pathway B:** Uses the sampled Gaussian distribution $\eta_t$ as input to a GRU, with the current feature $x_t$ as the initial hidden state.
-
-<img width="753" alt="Dual Pathway Modelling for Prediction" src="https://github.com/user-attachments/assets/file-G5zGtIKYSgPcFH5a6wXqhDFz">
+  
+<img width="483" alt="Screenshot 2024-08-27 at 5 29 51 PM" src="https://github.com/user-attachments/assets/f79ea28d-2fb2-454b-ad99-aca0866acc15">
 **Figure:** This image illustrates the Dual Pathway Modelling for Prediction, breaking it down into:
 
 - **(i) Latent Code Generation:** The latent code is derived from the distribution of feature maps, represented as a Gaussian distribution with mean $\mu_t$ and variance $\sigma_t^2$.
@@ -182,6 +182,12 @@ The system generates a set of possible trajectories using a simplified vehicle m
 - **Post-Selection Refinement:** After selecting the optimal trajectory, the system further refines it using a GRU network. This step integrates information from the front-view camera (such as the status of traffic lights) to ensure the trajectory is safe and appropriate given the current traffic conditions.
 - **Adjustment of Trajectory:** The GRU refines the trajectory by processing the trajectory points $\tau^*$ and adjusting them based on real-time visual information from the cameras.
 
+<img width="475" alt="Screenshot 2024-08-27 at 5 31 41 PM" src="https://github.com/user-attachments/assets/d01add09-d1a7-4cf1-b0a7-8a5c9fe9ec15">
+**Figure:** This image illustrates the Prior Knowledge Integration and Refinement process used in the Planning module, breaking it down into:
+
+- **Scene Representations:** Uses predicted future states and map information to generate scene representations.
+- **Aggregated Cost Map:** Combines rule-based and learning-based methods to produce a cost map over $H$ horizons.
+- **Sampler and GRU Refinement:** Selects the optimal trajectory using the cost map and refines it further using front-view vision features, guided by high-level commands like "Go Straight."
 ---
 
 ## Breakdown of the Loss Function
