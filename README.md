@@ -85,6 +85,8 @@ The framework introduces an accumulative ego-centric alignment method, which inc
    - **Equation:**
 
    $$\tilde{x}_t = b_t + \sum_{i=1}^{t-1} \alpha^i \times \tilde{x}_{t-i}$$
+  $$ \tilde{x}_t = b_t + \sum_{i=1}^{t-1} \alpha^i \times \tilde{x}_{t-i} $$
+
 
    - Here, \( \tilde{x}_t \) represents the accumulated feature, and \( b_t \) is the BEV feature map.
    - **3D Convolutions:** These fused features are then processed with 3D convolutions to improve the perception of dynamic objects, using the equation:
