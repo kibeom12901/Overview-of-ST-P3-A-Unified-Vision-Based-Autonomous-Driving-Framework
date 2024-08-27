@@ -74,13 +74,13 @@ The framework introduces an accumulative ego-centric alignment method, which inc
 1. **Spatial Fusion:**
    - **Transformation:** Multi-view images are transformed into a common 3D frame using depth predictions.
    - **Feature Extraction:** Features from each camera image are lifted into 3D space based on depth estimations, using the equation:
-     \[
+     \
      u_i^k = f_i^k \otimes d_i^k
-     \]
+     \
      
-     \[
+     \
      v_i^k = g_i^k \otimes z_i^k
-     \]
+     \
      - Here, \( u_i^k \) represents the 3D features, \( f_i^k \) is the feature map, and \( d_i^k \) is the depth map.
    - **Alignment:** These features are then aligned to the current view using the vehicle’s ego-motion and pooled into BEV features.
 
