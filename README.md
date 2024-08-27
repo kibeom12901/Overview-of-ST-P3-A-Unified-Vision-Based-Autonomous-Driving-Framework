@@ -36,6 +36,7 @@
 ---
 
 ## Detailed Framework of ST-P3
+<img width="753" alt="Screenshot 2024-08-27 at 5 12 33 PM" src="https://github.com/user-attachments/assets/57091a6f-c356-4771-969a-60ec4182a61b">
 
 ### Perception
 - **Input**: Multi-view camera images capturing different perspectives around the vehicle.
@@ -80,6 +81,14 @@ The framework introduces an accumulative ego-centric alignment method, which inc
 
 - **Alignment:** These features are then aligned to the current view using the vehicle’s ego-motion and pooled into BEV features.
 
+![Spatial Fusion Process](https://github.com/user-attachments/assets/file-KMsJLiumjPDwW6QIjabFFrig)
+
+**Figure:** This image illustrates the Egocentric-Aligned Accumulation process used in the Perception module, breaking it down into:
+
+- **(a) Feature Extraction:** Extracts features and performs depth estimation.
+- **(b) Egocentric Alignment:** Aligns 3D features from previous frames with the current view.
+- **(c) Accumulation:** Fuses all past and current states to enhance the BEV feature representation.
+
 ### 2. Temporal Fusion
 - **Enhancement of Static Object Perception:** A temporal fusion technique is applied to enhance the perception of static objects by using a self-attention mechanism that boosts the importance of features from previous time steps.
 
@@ -109,6 +118,17 @@ In dynamic driving environments, predicting future trajectories is challenging d
 #### 2. Dual Pathway Architecture
 - **Pathway A:** Integrates BEV features up to the current timestamp with the uncertainty distribution. This pathway uses historical features as input to a GRU (Gated Recurrent Unit), where the first feature $x_1$ is used as the initial hidden state.
 - **Pathway B:** Uses the sampled Gaussian distribution $\eta_t$ as input to a GRU, with the current feature $x_t$ as the initial hidden state.
+
+<img width="753" alt="Dual Pathway Modelling for Prediction" src="https://github.com/user-attachments/assets/file-G5zGtIKYSgPcFH5a6wXqhDFz">
+**Figure:** This image illustrates the Dual Pathway Modelling for Prediction, breaking it down into:
+
+- **(i) Latent Code Generation:** The latent code is derived from the distribution of feature maps, represented as a Gaussian distribution with mean $\mu_t$ and variance $\sigma_t^2$.
+
+- **(ii) Pathway A:** Incorporates the uncertainty distribution ($\eta_t$) to account for the multi-modal nature of the future. This pathway leverages GRU (Gated Recurrent Unit) to predict future states sequentially.
+
+- **(iii) Pathway B:** Focuses on learning from past variations by processing historical features ($x_1, x_{t-1}, x_t$) through a series of GRUs. This pathway helps compensate for information gaps in Pathway A by reinforcing predictions with historical data.
+
+- **Fusion:** The outputs from both pathways are fused together at each time step to generate a combined prediction for the future state ($\hat{x}_{t+1}, \hat{x}_{t+2}, \dots, \hat{x}_{t+H}$).
 
 #### 3. Prediction Combination
 
