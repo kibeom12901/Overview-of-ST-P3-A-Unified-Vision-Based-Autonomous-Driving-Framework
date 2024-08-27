@@ -120,6 +120,7 @@ In dynamic driving environments, predicting future trajectories is challenging d
 - **Pathway B:** Uses the sampled Gaussian distribution $\eta_t$ as input to a GRU, with the current feature $x_t$ as the initial hidden state.
   
 <img width="483" alt="Screenshot 2024-08-27 at 5 29 51 PM" src="https://github.com/user-attachments/assets/f79ea28d-2fb2-454b-ad99-aca0866acc15">
+
 **Figure:** This image illustrates the Dual Pathway Modelling for Prediction, breaking it down into:
 
 - **(i) Latent Code Generation:** The latent code is derived from the distribution of feature maps, represented as a Gaussian distribution with mean $\mu_t$ and variance $\sigma_t^2$.
@@ -128,7 +129,11 @@ In dynamic driving environments, predicting future trajectories is challenging d
 
 - **(iii) Pathway B:** Focuses on learning from past variations by processing historical features ($x_1, x_{t-1}, x_t$) through a series of GRUs. This pathway helps compensate for information gaps in Pathway A by reinforcing predictions with historical data.
 
-- **Fusion:** The outputs from both pathways are fused together at each time step to generate a combined prediction for the future state ($\hat{x}_{t+1}, \hat{x}_{t+2}, \dots, \hat{x}_{t+H}$).
+- **Fusion:** The outputs from both pathways are fused together at each time step to generate a combined prediction for the future state.
+
+![Latex Equation](https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D_%7Bt%2B1%7D%20%3D%20G(x_t%2C%20%5Ceta_t)%20%5Coplus%20G(x_%7B0%3At%7D))
+
+![Latex Equation](https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D_%7Bt%2B2%7D%20%2C%20%5Chat%7Bx%7D_%7Bt%2B3%7D%2C%20%5Cldots%2C%20%5Chat%7Bx%7D_%7Bt%2BH%7D)
 
 #### 3. Prediction Combination
 
@@ -183,6 +188,7 @@ The system generates a set of possible trajectories using a simplified vehicle m
 - **Adjustment of Trajectory:** The GRU refines the trajectory by processing the trajectory points $\tau^*$ and adjusting them based on real-time visual information from the cameras.
 
 <img width="475" alt="Screenshot 2024-08-27 at 5 31 41 PM" src="https://github.com/user-attachments/assets/d01add09-d1a7-4cf1-b0a7-8a5c9fe9ec15">
+
 **Figure:** This image illustrates the Prior Knowledge Integration and Refinement process used in the Planning module, breaking it down into:
 
 - **Scene Representations:** Uses predicted future states and map information to generate scene representations.
