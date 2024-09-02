@@ -131,13 +131,10 @@ In dynamic driving environments, predicting future trajectories is challenging d
 
 - **Fusion:** The outputs from both pathways are fused together at each time step to generate a combined prediction for the future state.
 
-![Latex Equation](https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D_%7Bt%2B1%7D%20%3D%20G(x_t%2C%20%5Ceta_t)%20%5Coplus%20G(x_%7B0%3At%7D))
-
-![Latex Equation](https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D_%7Bt%2B2%7D%20%2C%20%5Chat%7Bx%7D_%7Bt%2B3%7D%2C%20%5Cldots%2C%20%5Chat%7Bx%7D_%7Bt%2BH%7D)
-
 #### 3. Prediction Combination
 
   ![equation](https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D_%7Bt%2B1%7D%20%3D%20G(x_t%2C%20%5Ceta_t)%20%5Coplus%20G(x_%7B0%3At%7D))
+  ![Latex Equation](https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D_%7Bt%2B2%7D%20%2C%20%5Chat%7Bx%7D_%7Bt%2B3%7D%2C%20%5Cldots%2C%20%5Chat%7Bx%7D_%7Bt%2BH%7D)
 
   Here, $G$ represents the GRU process, and $\oplus$ denotes the combination of these predictions.
 
@@ -233,61 +230,4 @@ The system generates a set of possible trajectories using a simplified vehicle m
 
   **Distance $d(\tau_h, \tau)$:** Measures how far the sampled trajectory $\tau$ is from the expert trajectory $\tau_h$. The goal is to minimize this distance for the selected trajectory.
 
----
-
-## Experiments
-
-### Overview
-- ST-P3 is evaluated in both open-loop and closed-loop environments.
-
-### Datasets Used
-- **nuScenes Dataset**: Used for open-loop evaluation, focusing on past 1.0s context to predict 2.0s into the future (3 frames in the past, 4 frames in the future).
-- **CARLA Simulator**: Used for closed-loop experiments to demonstrate the robustness and applicability of ST-P3.
-
-### Open-loop Experimental Results on nuScenes
-- **Perception**:
-  - Evaluated on map representation (drivable area and lanes) and semantic segmentation (vehicles and pedestrians).
-  - **Metric**: Intersection-over-Union (IoU) in BEV segmentation.
-  - **Results**:
-    - ST-P3 outperforms other models in most cases, achieving the highest mean IoU value (42.69%).
-    - The Egocentric Aligned Accumulation algorithm contributed to surpassing the previous state-of-the-art by 2.51%.
-- **Prediction**:
-  - Focuses on predicting future segmentation in BEV.
-  - **Metrics**: IoU, Panoptic Quality (PQ), Recognition Quality (RQ), Segmentation Quality (SQ).
-  - **Results**:
-    - ST-P3 achieves state-of-the-art results across all metrics.
-    - The Gaussian version of ST-P3 performs slightly worse than the Bernoulli version, but is chosen for its smaller memory usage.
-- **Planning**:
-  - **Evaluation Metrics**: L2 error (between planned and human driving trajectories) and collision rate.
-  - **Results**:
-    - ST-P3 achieves the lowest collision rate, indicating superior safety in planned trajectories.
-    - Although the Vanilla approach had the lowest L2 error, it resulted in the highest collision rates.
-
-### Closed-loop Planning Results on CARLA Simulator
-- **Closed-Loop Experiments**:
-  - Conducted in the CARLA simulator to assess ST-P3's robustness in dynamic and cumulative error-prone environments.
-- **Metrics**:
-  - Route Completion (RC): The percentage of the route completed.
-  - Driving Score (DS): RC weighted by penalties for collisions with pedestrians, vehicles, etc.
-- **Results**:
-  - ST-P3 outperforms vision-based baselines in all scenarios.
-  - Achieves better route completion in long-range tests compared to a LiDAR-based method.
-  - ST-P3 demonstrates impressive recovery from collisions, aided by front-view vision refinement.
-
-### Ablation Study
-- **Objective**:
-  - To evaluate the effectiveness of various components in ST-P3, such as depth supervision, Egocentric Aligned Accumulation (EAA), Dual Modelling, and the sampler and refinement units.
-- **Perception Module**:
-  - **Experiments 1-3**: Examine the impact of depth supervision and EAA on perception tasks.
-  - **Results**:
-    - EAA improves vehicle IoU by 0.79%.
-    - Explicit depth supervision adds a further 1.31% improvement.
-- **Prediction Module**:
-  - **Experiments 4-6**: Assess the impact of Dual Modelling and Loss for All timestamps (LFA) on prediction tasks.
-  - **Results**:
-    - Dual Modelling, which considers uncertainty and historical continuity, enhances vehicle IoU by 1.54% and vehicle PQ by 3.09%.
-- **Planning Module**:
-  - **Experiments 7-9**: Focus on the sampler and GRU refinement units in planning.
-  - **Results**:
-    - A sampler without front-view vision refinement (Exp.7) or implicit models without prior sampling knowledge (Exp.8) result in higher L2 errors and collision rates.
-    - ST-P3’s design significantly improves the safety and accuracy of planned trajectories.
+For more details and updates, you can refer to the official [ST-P3 GitHub repository](https://arxiv.org/pdf/2207.07601).
