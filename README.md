@@ -230,4 +230,4 @@ The system generates a set of possible trajectories using a simplified vehicle m
 
   **Distance $d(\tau_h, \tau)$:** Measures how far the sampled trajectory $\tau$ is from the expert trajectory $\tau_h$. The goal is to minimize this distance for the selected trajectory.
 
-For more details and updates, you can refer to the official [ST-P3 GitHub repository](https://arxiv.org/pdf/2207.07601).
+For more details and updates, you can refer to the official [ST-P3 Research Paper](https://arxiv.org/pdf/2207.07601).
